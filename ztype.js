@@ -3,78 +3,13 @@
 (function(window) {
     "use strict";
 
-    /**
-     * Z-Type game config – tweak waves, difficulty and multipliers here.
-     *
-     * Wave types (string names): "EntityEnemyMine", "EntityEnemyDestroyer", "EntityEnemyOppressor".
-     * - spawnWait: base seconds between spawns (per wave).
-     * - spawnWaitDecay / spawnWaitMin / spawnWaitMax: each wave spawnWait *= decay, then clamp.
-     * - speedIncrease: each wave enemy speed is multiplied by this.
-     * - healthBoost: added to enemy health (0 = use word length).
-     * - types[].count: starting count of that enemy per wave.
-     * - types[].incEvery: every N waves add one more of this type.
-     *
-     * Not here (still on entity classes): word length min/max, enemy speed/health, doc-mode
-     * constants (e.g. nextDocFragment bigShipChance 0.75, wave-end delay 2s).
-     */
-    var ZTYPE_CONFIG_DEFAULT = {
-        spawnWaitDecay: 0.97,
-        spawnWaitMin: 0.2,
-        spawnWaitMax: 1,
-        multiplierTiers: { 20: 2, 50: 3 },
-        waves: {
-            MOBILE: {
-                spawnWait: 1,
-                healthBoost: 0,
-                speedIncrease: 1.01,
-                types: [
-                    { type: "EntityEnemyOppressor", count: 0, incEvery: 9 },
-                    { type: "EntityEnemyDestroyer", count: 0, incEvery: 4 },
-                    { type: "EntityEnemyMine", count: 3, incEvery: 1 }
-                ]
-            },
-            DESKTOP: {
-                spawnWait: 0.7,
-                healthBoost: 0,
-                speedIncrease: 1.05,
-                types: [
-                    { type: "EntityEnemyOppressor", count: 0, incEvery: 7 },
-                    { type: "EntityEnemyDestroyer", count: 0, incEvery: 3 },
-                    { type: "EntityEnemyMine", count: 3, incEvery: 1 }
-                ]
-            }
-        }
-    };
-    window.ZTYPE_CONFIG = {
-        spawnWaitDecay: 0.97,
-        spawnWaitMin: 0.2,
-        spawnWaitMax: 1,
-        multiplierTiers: { 20: 2, 50: 3 },
-        waves: {
-            MOBILE: {
-                spawnWait: 1,
-                healthBoost: 0,
-                speedIncrease: 1.01,
-                types: [
-                    { type: "EntityEnemyOppressor", count: 0, incEvery: 9 },
-                    { type: "EntityEnemyDestroyer", count: 0, incEvery: 4 },
-                    { type: "EntityEnemyMine", count: 3, incEvery: 1 }
-                ]
-            },
-            // fixed enemies amount - my current config
-            DESKTOP: {
-                spawnWait: 0.7,
-                healthBoost: 0,
-                speedIncrease: 1.005,
-                types: [
-                    { type: "EntityEnemyOppressor", count: 1, incEvery: 999 },
-                    { type: "EntityEnemyDestroyer", count: 1, incEvery: 999 },
-                    { type: "EntityEnemyMine", count: 8, incEvery: 999 }
-                ]
-            }
-        }
-    };
-
+    /* Config must be loaded from ztype-config.js before this file. */
+    if (typeof window.ZTYPE_CONFIG === "undefined") {
+        throw new Error("ZTYPE_CONFIG is not defined. Load ztype-config.js before ztype.js (e.g. in index.html).");
+    } else {
+        console.log('config: ', JSON.stringify(window.ZTYPE_CONFIG, null, 2));
+    }
+    
     Number.prototype.map = function(istart, istop, ostart, ostop) {
         return ostart + (ostop - ostart) * ((this - istart) / (istop - istart));
     }
