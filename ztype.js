@@ -61,14 +61,15 @@
                     { type: "EntityEnemyMine", count: 3, incEvery: 1 }
                 ]
             },
+            // fixed enemies amount - my current config
             DESKTOP: {
                 spawnWait: 0.7,
                 healthBoost: 0,
-                speedIncrease: 1.05,
+                speedIncrease: 1.005,
                 types: [
-                    { type: "EntityEnemyOppressor", count: 1, incEvery: 7 },
-                    { type: "EntityEnemyDestroyer", count: 1, incEvery: 3 },
-                    { type: "EntityEnemyMine", count: 3, incEvery: 1 }
+                    { type: "EntityEnemyOppressor", count: 1, incEvery: 999 },
+                    { type: "EntityEnemyDestroyer", count: 1, incEvery: 999 },
+                    { type: "EntityEnemyMine", count: 8, incEvery: 999 }
                 ]
             }
         }
