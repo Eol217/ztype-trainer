@@ -2,6 +2,78 @@
 
 (function(window) {
     "use strict";
+
+    /**
+     * Z-Type game config – tweak waves, difficulty and multipliers here.
+     *
+     * Wave types (string names): "EntityEnemyMine", "EntityEnemyDestroyer", "EntityEnemyOppressor".
+     * - spawnWait: base seconds between spawns (per wave).
+     * - spawnWaitDecay / spawnWaitMin / spawnWaitMax: each wave spawnWait *= decay, then clamp.
+     * - speedIncrease: each wave enemy speed is multiplied by this.
+     * - healthBoost: added to enemy health (0 = use word length).
+     * - types[].count: starting count of that enemy per wave.
+     * - types[].incEvery: every N waves add one more of this type.
+     *
+     * Not here (still on entity classes): word length min/max, enemy speed/health, doc-mode
+     * constants (e.g. nextDocFragment bigShipChance 0.75, wave-end delay 2s).
+     */
+    var ZTYPE_CONFIG_DEFAULT = {
+        spawnWaitDecay: 0.97,
+        spawnWaitMin: 0.2,
+        spawnWaitMax: 1,
+        multiplierTiers: { 20: 2, 50: 3 },
+        waves: {
+            MOBILE: {
+                spawnWait: 1,
+                healthBoost: 0,
+                speedIncrease: 1.01,
+                types: [
+                    { type: "EntityEnemyOppressor", count: 0, incEvery: 9 },
+                    { type: "EntityEnemyDestroyer", count: 0, incEvery: 4 },
+                    { type: "EntityEnemyMine", count: 3, incEvery: 1 }
+                ]
+            },
+            DESKTOP: {
+                spawnWait: 0.7,
+                healthBoost: 0,
+                speedIncrease: 1.05,
+                types: [
+                    { type: "EntityEnemyOppressor", count: 0, incEvery: 7 },
+                    { type: "EntityEnemyDestroyer", count: 0, incEvery: 3 },
+                    { type: "EntityEnemyMine", count: 3, incEvery: 1 }
+                ]
+            }
+        }
+    };
+    window.ZTYPE_CONFIG = {
+        spawnWaitDecay: 0.97,
+        spawnWaitMin: 0.2,
+        spawnWaitMax: 1,
+        multiplierTiers: { 20: 2, 50: 3 },
+        waves: {
+            MOBILE: {
+                spawnWait: 1,
+                healthBoost: 0,
+                speedIncrease: 1.01,
+                types: [
+                    { type: "EntityEnemyOppressor", count: 0, incEvery: 9 },
+                    { type: "EntityEnemyDestroyer", count: 0, incEvery: 4 },
+                    { type: "EntityEnemyMine", count: 3, incEvery: 1 }
+                ]
+            },
+            DESKTOP: {
+                spawnWait: 0.7,
+                healthBoost: 0,
+                speedIncrease: 1.05,
+                types: [
+                    { type: "EntityEnemyOppressor", count: 1, incEvery: 7 },
+                    { type: "EntityEnemyDestroyer", count: 1, incEvery: 3 },
+                    { type: "EntityEnemyMine", count: 3, incEvery: 1 }
+                ]
+            }
+        }
+    };
+
     Number.prototype.map = function(istart, istop, ostart, ostop) {
         return ostart + (ostop - ostart) * ((this - istart) / (istop - istart));
     }
@@ -5170,7 +5242,7 @@ ig.module('game.main').requires('impact.game', 'impact.font', 'game.menus.about'
         },
         nextWave: function() {
             this.wave.wave++;
-            this.wave.spawnWait = (this.wave.spawnWait * 0.97).limit(0.2, 1);
+            this.wave.spawnWait = (this.wave.spawnWait * window.ZTYPE_CONFIG.spawnWaitDecay).limit(window.ZTYPE_CONFIG.spawnWaitMin, window.ZTYPE_CONFIG.spawnWaitMax);
             this.wave.currentSpawnWait = this.wave.spawnWait;
             this.wave.spawn = [];
             this.speedFactor *= this.wave.speedIncrease;
@@ -5672,54 +5744,29 @@ ig.module('game.main').requires('impact.game', 'impact.font', 'game.menus.about'
         GAME: 1,
         GAME_OVER: 2
     };
-    ZType.MULTIPLIER_TIERS = {
-        20: 2,
-        50: 3
-    };
-    ZType.WAVES = {
-        MOBILE: {
-            fragment: 0,
-            wave: 0,
-            spawn: [],
-            spawnWait: 1,
-            healthBoost: 0,
-            speedIncrease: 1.01,
-            types: [{
-                type: EntityEnemyOppressor,
-                count: 0,
-                incEvery: 9
-            }, {
-                type: EntityEnemyDestroyer,
-                count: 0,
-                incEvery: 4
-            }, {
-                type: EntityEnemyMine,
-                count: 3,
-                incEvery: 1
-            }]
-        },
-        DESKTOP: {
-            fragment: 0,
-            wave: 0,
-            spawn: [],
-            spawnWait: 0.7,
-            healthBoost: 0,
-            speedIncrease: 1.05,
-            types: [{
-                type: EntityEnemyOppressor,
-                count: 0,
-                incEvery: 7
-            }, {
-                type: EntityEnemyDestroyer,
-                count: 0,
-                incEvery: 3
-            }, {
-                type: EntityEnemyMine,
-                count: 3,
-                incEvery: 1
-            }]
+    ZType.MULTIPLIER_TIERS = window.ZTYPE_CONFIG.multiplierTiers;
+    ZType.WAVES = {};
+    (function() {
+        var cfg = window.ZTYPE_CONFIG.waves;
+        for (var diff in cfg) {
+            var w = cfg[diff];
+            var types = [];
+            for (var i = 0; i < w.types.length; i++) {
+                var t = w.types[i];
+                var EntityClass = typeof t.type === "string" ? (window[t.type] || ig.global[t.type]) : t.type;
+                types.push({ type: EntityClass, count: t.count, incEvery: t.incEvery });
+            }
+            ZType.WAVES[diff] = {
+                fragment: 0,
+                wave: 0,
+                spawn: [],
+                spawnWait: w.spawnWait,
+                healthBoost: w.healthBoost,
+                speedIncrease: w.speedIncrease,
+                types: types
+            };
         }
-    };
+    })();
     var canvas = document.getElementById('ztype-game-canvas');
     var width = 480;
     var height = 720;
