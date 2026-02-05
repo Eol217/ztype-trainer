@@ -4694,7 +4694,8 @@ ig.module('game.keyboard').requires('impact.font').defines(function() {
             if (!ig.game.emps) {
                 ctx.globalAlpha = 0.7;
             }
-            this.empButton.drawTile(this.x + 582, this.y + 250, ig.game.emps, 34, 40);
+            // this.empButton.drawTile(this.x + 582, this.y + 250, ig.game.emps, 34, 40);
+            this.font.draw(ig.game.emps.toString(), this.x + 582 + 17, this.y + 250, ig.Font.ALIGN.CENTER);
             ctx.globalAlpha = 0.15;
             this.pauseButton.draw(28, 28);
             ctx.restore();
@@ -4720,7 +4721,9 @@ ig.module('game.keyboard').requires('impact.font').defines(function() {
             if (!ig.game.emps) {
                 ctx.globalAlpha = 0.7;
             }
-            this.empButton.drawTile(this.x + 582, this.y, ig.game.emps, 34, 40);
+            // this.empButton.drawTile(this.x + 582, this.y, ig.game.emps, 34, 40);
+            this.font.draw(ig.game.emps.toString(), this.x + 582 + 17, this.y, ig.Font.ALIGN.CENTER);
+
             ctx.globalAlpha = 0.1;
             this.pauseButton.draw(28, 28);
             ctx.restore();
@@ -5178,6 +5181,10 @@ ig.module('game.main').requires('impact.game', 'impact.font', 'game.menus.about'
         },
         nextWave: function() {
             this.wave.wave++;
+            var cfg = window.ZTYPE_CONFIG;
+            if (cfg.empIncEvery > 0 && this.wave.wave % cfg.empIncEvery === 0) {
+                this.emps++;
+            }
             this.wave.spawnWait = (this.wave.spawnWait * window.ZTYPE_CONFIG.spawnWaitDecay).limit(window.ZTYPE_CONFIG.spawnWaitMin, window.ZTYPE_CONFIG.spawnWaitMax);
             this.wave.currentSpawnWait = this.wave.spawnWait;
             this.wave.spawn = [];
@@ -5459,7 +5466,7 @@ ig.module('game.main').requires('impact.game', 'impact.font', 'game.menus.about'
             this.nextWave();
             ig.music.next();
             this.spawnSound.play();
-            this.emps = 3;
+            this.emps = window.ZTYPE_CONFIG.empCount;
         },
         setGameOver: function() {
             if (this.score > this.personalBest) {

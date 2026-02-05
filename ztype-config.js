@@ -1,6 +1,9 @@
 /**
  * Z-Type game config. Load this script before ztype.js (e.g. in index.html).
  *
+ * EMP (Enter key): kills enemies near the player. empCount: starting EMPs per run.
+ * empIncEvery: add 1 EMP every N waves (0 = never increase).
+ *
  * Wave types: "EntityEnemyMine", "EntityEnemyDestroyer", "EntityEnemyOppressor".
  * - spawnWait: base seconds between spawns per wave.
  * - spawnWaitDecay / spawnWaitMin / spawnWaitMax: each wave spawnWait *= decay, then clamp.
@@ -9,6 +12,8 @@
  * - types[].incEvery: add one more of this type every N waves (0 = never increase).
  */
 var ZTYPE_CONFIG_DEFAULT = {
+    empCount: 3,
+    empIncEvery: 0,
     spawnWaitDecay: 0.97,
     spawnWaitMin: 0.2,
     spawnWaitMax: 1,
@@ -16,7 +21,7 @@ var ZTYPE_CONFIG_DEFAULT = {
     waves: {
         MOBILE: {
             spawnWait: 1,
-            healthBoost: 0,
+            healthBoost: 0, // not used?
             speedIncrease: 1.01,
             types: [
                 { type: "EntityEnemyOppressor", count: 0, incEvery: 9 },
@@ -39,6 +44,8 @@ var ZTYPE_CONFIG_DEFAULT = {
 
 // Active config (edit this, or set to ZTYPE_CONFIG_DEFAULT for defaults)
 window.ZTYPE_CONFIG = {
+    empCount: 3,
+    empIncEvery: 10,
     spawnWaitDecay: 0.97,
     spawnWaitMin: 0.2,
     spawnWaitMax: 1,
